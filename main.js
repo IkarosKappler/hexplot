@@ -1,13 +1,14 @@
 /**
- * Compute the 'angle' of a line.
+ * Draw a hex plot.
  * 
- * @author  Ikaros Kappler a.k.a. Ika Henning Diesenberg
- * @date    2018-03-15
+ * @author  Ikaros Kappler
+ * @date    2018-03-131
  * @version 1.0.0
  **/
 
 
 var RAD2DEG = 180/Math.PI;
+var DEG2RAD = Math.PI/180;
 
 
 (function() {
@@ -33,19 +34,15 @@ var RAD2DEG = 180/Math.PI;
 	document.getElementById('info').innerHTML = info;
     }
 
-    //function atan2ToAtanX(a) {
-	// Clockwise beginning at top
-    //	return (a > 0 ? a : (2*Math.PI + a));
-    //}
-
     function atanYX( x, y ) {
-	// Swapping (x,y) to (-y,x) rotates the point by 90° :)
-	return Math.atan2(-y,x);
+        // Swapping (x,y) to (-y,x) rotates the point by 90° :)
+        return Math.atan2(-y,x);
     }
 
     function wrapTo2Pi( a ) {
-	return (a > 0 ? (Math.PI*2 - a) : -a);
+        return (a > 0 ? (Math.PI*2 - a) : -a);
     }
+
 
     // +-------------------------------------------------------------------------
     // | Just start the computation. The function is triggered each time the
@@ -69,36 +66,35 @@ var RAD2DEG = 180/Math.PI;
 	var angle = atan; 
 	var angleDeg = wrapTo2Pi(angle) / Math.PI * 180;
 
+	var length = Math.sqrt( Math.pow(mouseX - center.x,2), Math.pow(center.y - mouseY,2) );
 
-	// Draw the angle
-	ctx.beginPath();
-	ctx.arc( center.x, center.y, 80, 0, angle, true );
-	ctx.strokeStyle = 'grey';
-	ctx.stroke();
-
+	drawHexPlot( center, length/5, angle, 6 );
 	
-	// Circular angles
-	ctx.beginPath();
-	ctx.arc( center.x, center.y, 160, 0, Math.PI*2, true );
-	ctx.strokeStyle = 'orange';
-	ctx.stroke();
-	var perpenCircle_x = 160*Math.cos(angle+Math.PI/2);
-	var perpenCircle_y = 160*Math.sin(angle+Math.PI/2);
-	drawLine( center.x, center.y, center.x+perpenCircle_x, center.y+perpenCircle_y, 'orange' );
-
-	
-	// Elliptic angles
-	ctx.beginPath();
-	ctx.ellipse( center.x, center.y, 160, 80, 0, 0, Math.PI*2, true );
-	ctx.strokeStyle = '#0048ff';
-	ctx.stroke();
-	var perpenEllip_x = 160*Math.cos(angle-Math.PI/2);
-	var perpenEllip_y = 80*Math.sin(angle-Math.PI/2);
-	drawLine( center.x, center.y, center.x+perpenEllip_x, center.y+perpenEllip_y, '#0048ff' );
-
-	
-
 	setInfo('mouse at ('+relX+','+relY+'), angle=' + angleDeg.toFixed(2) + '°, atan2=' + (Math.atan2(relX,relY)*RAD2DEG).toFixed(2) + '°, atanYX=' + (atan*RAD2DEG).toFixed(2) );
+    }
+
+    function drawHexPlot( start, length, direction, depth ) {
+
+	if( depth < 0 )
+	    return;
+
+	for( var i = 0; i < 3; i++ ) {
+	    var rand  = Math.round( Math.random()*180 );  
+	    var angle = rand/3;
+	    var mod   = angle % 60;
+	    if( mod < 30 )
+		angle = angle-mod;
+	    else
+		angle = angle + 60 - mod;
+
+	    angle *= RAD2DEG;
+
+	    var x = length * Math.cos(direction+angle);
+	    var y = length * Math.sin(direction+angle);
+	    drawLine( start.x, start.y, start.x+x, start.y+y, 'orange' );
+	    
+	    drawHexPlot( { x : start.x+x, y : start.y+y }, length, direction+angle, depth-1 );
+	}
     }
 
     // +-------------------------------------------------------------------------
