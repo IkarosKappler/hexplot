@@ -68,7 +68,7 @@ var DEG2RAD = Math.PI/180;
 
 	var length = Math.sqrt( Math.pow(mouseX - center.x,2), Math.pow(center.y - mouseY,2) );
 
-	drawHexPlot( center, length/5, angle, 6 );
+	drawHexPlot( center, length/10, angle, 10 );
 	
 	setInfo('mouse at ('+relX+','+relY+'), angle=' + angleDeg.toFixed(2) + '°, atan2=' + (Math.atan2(relX,relY)*RAD2DEG).toFixed(2) + '°, atanYX=' + (atan*RAD2DEG).toFixed(2) );
     }
@@ -78,7 +78,7 @@ var DEG2RAD = Math.PI/180;
 	if( depth < 0 )
 	    return;
 
-	for( var i = 0; i < 3; i++ ) {
+	for( var i = 0; i < 2; i++ ) {
 	    var rand  = Math.round( Math.random()*180 );  
 	    var angle = rand/3;
 	    var mod   = angle % 60;
@@ -86,6 +86,8 @@ var DEG2RAD = Math.PI/180;
 		angle = angle-mod;
 	    else
 		angle = angle + 60 - mod;
+
+	    //angle -= 30;
 
 	    angle *= RAD2DEG;
 
