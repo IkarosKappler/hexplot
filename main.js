@@ -25,6 +25,9 @@ var DEG2RAD = Math.PI/180;
 
     var mouseX = null;
     var mouseY = null;
+
+    var startColor = new Color(255,128,0); // orange
+    var endColor   = new Color(0,128,255); // blue
     
     // +-------------------------------------------------------------------------
     // | Set the into text.
@@ -67,15 +70,27 @@ var DEG2RAD = Math.PI/180;
 
 	var length = Math.sqrt( Math.pow(mouseX - center.x,2), Math.pow(center.y - mouseY,2) );
 
-	drawHexPlot( center, length/10, angle, 10 );
+	drawHexPlot( center, length/10, angle, angle, 10, 10 );
 	
 	setInfo('mouse at ('+relX+','+relY+'), angle=' + angleDeg.toFixed(2) + '°, atan2=' + (Math.atan2(relX,relY)*RAD2DEG).toFixed(2) + '°, atanYX=' + (atan*RAD2DEG).toFixed(2) );
     }
 
-    function drawHexPlot( start, length, direction, depth ) {
+    function drawHexPlot( start, length, curDirection, globalDirection, curIteration, depth ) {
 
-	if( depth < 0 )
+	if( curIteration < 0 )
 	    return;
+
+	/*
+	if( curDirection < globalDirection-2*Math.PI/3 )
+	    return;
+	if( curDirection > globalDirection+2*Math.PI/3 )
+	    return;
+	*/
+	
+	var x = length * Math.cos(curDirection);
+	var y = length * Math.sin(curDirection);
+	var color = startColor.interpolate(endColor,curIteration/depth);
+	drawLine( start.x, start.y, start.x+x, start.y+y, color );
 
 	for( var i = 0; i < 2; i++ ) {
 	    /* var rand  = Math.round( Math.random()*180 );  
@@ -88,17 +103,11 @@ var DEG2RAD = Math.PI/180;
 
 	    //angle -= 30;
 	    */
-	    var angle = direction;
+	    var angle = curDirection;
 	    if( i == 0 ) angle -= Math.PI/3;
 	    else         angle += Math.PI/3;
-
-	    //angle *= RAD2DEG;
-
-	    var x = length * Math.cos(direction+angle);
-	    var y = length * Math.sin(direction+angle);
-	    drawLine( start.x, start.y, start.x+x, start.y+y, 'orange' );
 	    
-	    drawHexPlot( { x : start.x+x, y : start.y+y }, length, direction, depth-1 );
+	    drawHexPlot( { x : start.x+x, y : start.y+y }, length, angle, globalDirection, curIteration-1, depth );
 	}
     }
 
