@@ -25,7 +25,6 @@ var DEG2RAD = Math.PI/180;
 
     var mouseX = null;
     var mouseY = null;
-
     
     // +-------------------------------------------------------------------------
     // | Set the into text.
@@ -79,7 +78,7 @@ var DEG2RAD = Math.PI/180;
 	    return;
 
 	for( var i = 0; i < 2; i++ ) {
-	    var rand  = Math.round( Math.random()*180 );  
+	    /* var rand  = Math.round( Math.random()*180 );  
 	    var angle = rand/3;
 	    var mod   = angle % 60;
 	    if( mod < 30 )
@@ -88,14 +87,18 @@ var DEG2RAD = Math.PI/180;
 		angle = angle + 60 - mod;
 
 	    //angle -= 30;
+	    */
+	    var angle = direction;
+	    if( i == 0 ) angle -= Math.PI/3;
+	    else         angle += Math.PI/3;
 
-	    angle *= RAD2DEG;
+	    //angle *= RAD2DEG;
 
 	    var x = length * Math.cos(direction+angle);
 	    var y = length * Math.sin(direction+angle);
 	    drawLine( start.x, start.y, start.x+x, start.y+y, 'orange' );
 	    
-	    drawHexPlot( { x : start.x+x, y : start.y+y }, length, direction+angle, depth-1 );
+	    drawHexPlot( { x : start.x+x, y : start.y+y }, length, direction, depth-1 );
 	}
     }
 
@@ -121,7 +124,7 @@ var DEG2RAD = Math.PI/180;
 	ctx.fillRect(0,0,canvasSize.width,canvasSize.height);
     }
     
-
+    /*
     function handleMouseMove(e) {
 	mouseX = e.pageX - this.offsetLeft; 
 	mouseY = e.pageY - this.offsetTop;
@@ -129,6 +132,7 @@ var DEG2RAD = Math.PI/180;
 	compute();
 	//console.log('mouse at '+mouseX+','+mouseY );
     }
+    */
     
 
     // +-------------------------------------------------------------------------
@@ -143,7 +147,12 @@ var DEG2RAD = Math.PI/180;
 	canvas = document.getElementById('canvas');
 	ctx    = canvas.getContext('2d');
 
-	canvas.addEventListener('mousemove', handleMouseMove);
+	// canvas.addEventListener('mousemove', handleMouseMove);
+	new MouseHandler(canvas).move( function(e) {
+	    mouseX = e.params.pos.x;
+	    mouseY = e.params.pos.y;
+	    compute();
+	} );
 
 	mouseX = 200;
 	mouseY = 200;
