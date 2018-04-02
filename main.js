@@ -7,8 +7,8 @@
  **/
 
 
-var RAD2DEG = 180/Math.PI;
-var DEG2RAD = Math.PI/180;
+//var RAD2DEG = 180/Math.PI;
+//var DEG2RAD = Math.PI/180;
 
 
 (function() {
@@ -36,6 +36,7 @@ var DEG2RAD = Math.PI/180;
 	document.getElementById('info').innerHTML = info;
     }
 
+    /*
     function atanYX( x, y ) {
         // Swapping (x,y) to (-y,x) rotates the point by 90° :)
         return Math.atan2(-y,x);
@@ -44,6 +45,7 @@ var DEG2RAD = Math.PI/180;
     function wrapTo2Pi( a ) {
         return (a > 0 ? (Math.PI*2 - a) : -a);
     }
+    */
 
 
     // +-------------------------------------------------------------------------
@@ -64,15 +66,15 @@ var DEG2RAD = Math.PI/180;
 	drawLine( center.x, center.y, mouseX, mouseY, 'black' );
 
 	// Do some basic computation.
-	var atan = atanYX(relX,relY);
-	var angle = atan; 
-	var angleDeg = wrapTo2Pi(angle) / Math.PI * 180;
+	var atan     = M.atanYX(relX,relY);
+	var angle    = atan; 
+	var angleDeg = M.wrapTo2Pi(angle) * M.RAD2DEG; // / Math.PI * 180;
+	var length   = Math.sqrt( Math.pow(mouseX - center.x,2), Math.pow(center.y - mouseY,2) );
 
-	var length = Math.sqrt( Math.pow(mouseX - center.x,2), Math.pow(center.y - mouseY,2) );
-
-	drawHexPlot( center, length/10, angle, angle, 10, 10 );
+	var diagonal = M.hypo( canvasSize.width/2, canvasSize.height/2 );
+	drawHexPlot( center, length/10 + (100/(120+length)), angle, angle, 10, 10 );
 	
-	setInfo('mouse at ('+relX+','+relY+'), angle=' + angleDeg.toFixed(2) + '°, atan2=' + (Math.atan2(relX,relY)*RAD2DEG).toFixed(2) + '°, atanYX=' + (atan*RAD2DEG).toFixed(2) );
+	setInfo('mouse at ('+relX+','+relY+'), angle=' + angleDeg.toFixed(2) + '°, atan2=' + (Math.atan2(relX,relY)*M.RAD2DEG).toFixed(2) + '°, atanYX=' + (atan*M.RAD2DEG).toFixed(2) );
     }
 
     function drawHexPlot( start, length, curDirection, globalDirection, curIteration, depth ) {
@@ -92,23 +94,12 @@ var DEG2RAD = Math.PI/180;
 	var color = startColor.interpolate(endColor,curIteration/depth);
 	drawLine( start.x, start.y, start.x+x, start.y+y, color );
 
-	for( var i = 0; i < 2; i++ ) {
-	    /* var rand  = Math.round( Math.random()*180 );  
-	    var angle = rand/3;
-	    var mod   = angle % 60;
-	    if( mod < 30 )
-		angle = angle-mod;
-	    else
-		angle = angle + 60 - mod;
-
-	    //angle -= 30;
-	    */
-	    var angle = curDirection;
-	    if( i == 0 ) angle -= Math.PI/3;
-	    else         angle += Math.PI/3;
-	    
-	    drawHexPlot( { x : start.x+x, y : start.y+y }, length, angle, globalDirection, curIteration-1, depth );
-	}
+	var angle = curDirection - Math.PI/3;   
+	drawHexPlot( { x : start.x+x, y : start.y+y }, length, angle, globalDirection, curIteration-1, depth );
+	
+	var angle = curDirection + Math.PI/3;
+	drawHexPlot( { x : start.x+x, y : start.y+y }, length, angle, globalDirection, curIteration-1, depth );
+	
     }
 
     // +-------------------------------------------------------------------------
@@ -132,16 +123,6 @@ var DEG2RAD = Math.PI/180;
 	ctx.fillStyle = '#f0f8ff';
 	ctx.fillRect(0,0,canvasSize.width,canvasSize.height);
     }
-    
-    /*
-    function handleMouseMove(e) {
-	mouseX = e.pageX - this.offsetLeft; 
-	mouseY = e.pageY - this.offsetTop;
-
-	compute();
-	//console.log('mouse at '+mouseX+','+mouseY );
-    }
-    */
     
 
     // +-------------------------------------------------------------------------
